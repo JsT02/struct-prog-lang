@@ -1,7 +1,7 @@
 """
-expression = term { ("+" | "-") term }
+expression = term { ("+" | "-") term } # Add unary negation here
 term = factor { ("*" | "/") factor }
-factor = number | "(" expression ")"
+factor = number | "(" expression ")" | "-" factor | "!"
 number = <number>
 """
 
@@ -38,8 +38,10 @@ def parse_factor(tokens):
         if tokens and tokens[0]["tag"] != ")":
             raise Exception("Expected ')'")
         return node, tokens[1:]
-    else:
-        raise Exception(f"Unexpected token: {tokens[0]}")
+    if tag == "-":
+        node, tokens = parse_factor(tokens[1:])
+        return create_node("negate", left = node), tokens[1:]
+    raise Exception(f"Unexpected token: {tokens[0]}")
 
 
 def parse(tokens):
@@ -73,7 +75,6 @@ def test_simple_addition_parsing():
         "left": {"tag": "number", "value": 1, "left": None, "right": None},
         "right": {"tag": "number", "value": 2, "left": None, "right": None},
     }
-
 
 def test_nested_expressions_parsing():
     print("test nested expressions parsing...")
