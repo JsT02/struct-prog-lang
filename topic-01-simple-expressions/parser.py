@@ -1,11 +1,9 @@
 """
-expression = term { ("+" | "-") term } # Add unary negation here
+expression = term { ("+" | "-") term }
 term = factor { ("*" | "/") factor }
-factor = number | "(" expression ")" | "-" factor | "!"
+factor = number | "(" expression ")" | "-" factor | "!" # Unary Negation added here
 number = <number>
 """
-
-
 def create_node(tag, left=None, right=None, value=None):
     return {"tag": tag, "value": value, "left": left, "right": right}
 
@@ -38,9 +36,9 @@ def parse_factor(tokens):
         if tokens and tokens[0]["tag"] != ")":
             raise Exception("Expected ')'")
         return node, tokens[1:]
-    if tag == "-":
+    if tag == "-": # Look for negation
         node, tokens = parse_factor(tokens[1:])
-        return create_node("negate", left = node), tokens[1:]
+        return create_node("negate", left = node), tokens
     raise Exception(f"Unexpected token: {tokens[0]}")
 
 
@@ -74,6 +72,22 @@ def test_simple_addition_parsing():
         "value": None,
         "left": {"tag": "number", "value": 1, "left": None, "right": None},
         "right": {"tag": "number", "value": 2, "left": None, "right": None},
+    }
+
+def test_unary_negation_parsing(): # Test for unary negation
+    print("testing unary negation parsing...")
+    tokens = tokenize("1+-2")
+    ast = parse(tokens)
+    assert ast == {
+       "tag": "+",
+       "value": None,
+       "left": {"tag": "number", "value": 1, "left": None, "right": None},
+        "right":{
+           "tag": "negate",
+           "value": None,
+           "left": {"tag": "number","value": 2,"left": None,"right": None},
+            "right": None
+        }
     }
 
 def test_nested_expressions_parsing():
@@ -129,6 +143,7 @@ def test_format_ast():
 
 if __name__ == "__main__":
     test_simple_addition_parsing()
+    test_unary_negation_parsing() # Added test for negation
     test_nested_expressions_parsing()
     test_operation_precedence_parsing()
     test_format_ast()

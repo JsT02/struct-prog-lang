@@ -9,8 +9,9 @@ def evaluate(ast):
 
     # Recursive cases: evaluate the left and right sub-trees and apply the operation
     left_value = evaluate(ast["left"])
+    if ast["tag"] == "negate": # Evaluate the negate
+        return -left_value
     right_value = evaluate(ast["right"])
-
     if ast["tag"] == "+":
         return left_value + right_value
     elif ast["tag"] == "-":
@@ -50,6 +51,20 @@ def test_evaluate_simple_addition():
     assert evaluate(ast) == 4
     assert evaluate(parse(tokenize("1 + 4"))) == 5
     equals("1 + 4", 5)
+
+def test_unary_negation():
+    print("testing unary negation.")
+    ast = {
+       "tag": "negate",
+       "left": {"tag": "number", "value": 3},
+       "right": None,
+    }
+    assert evaluate(ast) == -3
+    t = tokenize("1 + -3")
+    ast = parse(t)
+    assert(evaluate(ast) == -2)
+    assert(evaluate(parse(tokenize("5+-2")))) == 3
+    equals("-6+3",-3)
 
 
 def test_evaluate_complex_expression():
@@ -91,6 +106,7 @@ def test_evaluate_division_by_zero():
 if __name__ == "__main__":
     print("testing evaluator.")
     test_evaluate_simple_addition()
+    test_unary_negation() # Added test for negation
     test_evaluate_complex_expression()
     test_evaluate_subtraction()
     test_evaluate_division()
