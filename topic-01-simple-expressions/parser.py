@@ -1,6 +1,6 @@
 """
-expression = term { ("+" | "-") term } 
-term = factor { ("*" | "/" | "%") factor } # Added modulus symbol to grammer
+expression = term { ("+" | "-") term }
+term = factor { ("*" | "/") factor }
 factor = number | "(" expression ")" | "-" factor | "!" # Unary Negation added here
 number = <number>
 """
@@ -19,7 +19,7 @@ def parse_expression(tokens):
 
 def parse_term(tokens):
     node, tokens = parse_factor(tokens)
-    while tokens[0]["tag"] in ["*", "/","%"]:
+    while tokens[0]["tag"] in ["*", "/"]:
         tag = tokens[0]["tag"]
         right_node, tokens = parse_factor(tokens[1:])
         node = create_node(tag, left=node, right=right_node)
@@ -72,17 +72,6 @@ def test_simple_addition_parsing():
         "value": None,
         "left": {"tag": "number", "value": 1, "left": None, "right": None},
         "right": {"tag": "number", "value": 2, "left": None, "right": None},
-    }
-
-def test_simple_modulus_parsing(): # Added test for modulus parsing
-    print("test simple modulus parsing...")
-    tokens = tokenize("10 % 3")
-    ast = parse(tokens)
-    assert ast == {
-        "tag": "%",
-        "value": None,
-        "left": {"tag": "number", "value": 10, "left": None, "right": None},
-        "right": {"tag": "number", "value": 3, "left": None, "right": None},
     }
 
 def test_unary_negation_parsing(): # Test for unary negation
@@ -154,8 +143,7 @@ def test_format_ast():
 
 if __name__ == "__main__":
     test_simple_addition_parsing()
-    test_simple_modulus_parsing() # Added test for modulus parsing
-    test_unary_negation_parsing() # Added test for negation parsing
+    test_unary_negation_parsing() # Added test for negation
     test_nested_expressions_parsing()
     test_operation_precedence_parsing()
     test_format_ast()
