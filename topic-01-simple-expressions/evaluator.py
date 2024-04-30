@@ -23,6 +23,10 @@ def evaluate(ast):
         if right_value == 0:
             raise Exception("Division by zero")
         return left_value / right_value
+    elif ast["tag"] == "%": # Added modulus
+        if right_value == 0:
+            raise Exception("Modulus by zero")
+        return left_value % right_value
     else:
         raise Exception(f"Unknown operation: {ast['tag']}")
 
@@ -51,6 +55,28 @@ def test_evaluate_simple_addition():
     assert evaluate(ast) == 4
     assert evaluate(parse(tokenize("1 + 4"))) == 5
     equals("1 + 4", 5)
+
+def test_evaluate_modulus(): # Added test for evaluating modulus
+    print("testing simple modulus.")
+    ast = {
+        "tag": "%",
+        "left": {"tag": "number","value": 10},
+        "right": {"tag": "number","value": 3},
+    }
+    assert evaluate(ast) == 1
+    t = tokenize("11 % 3")
+    ast = parse(t)
+    assert evaluate(ast) == 2
+    assert evaluate(parse(tokenize("12%3"))) == 0
+    equals("13 % 3",1)
+
+def test_evaluate_modulus_by_zero(): # Added test for evaluating a modulus by zero error
+    print("testing modulus by zero.")
+    try:
+        equals("1 % 0", None)
+        assert False, "Expected a modulus by zero error"
+    except Exception as e:
+        assert str(e) == "Modulus by zero"
 
 def test_unary_negation():
     print("testing unary negation.")
@@ -106,6 +132,8 @@ def test_evaluate_division_by_zero():
 if __name__ == "__main__":
     print("testing evaluator.")
     test_evaluate_simple_addition()
+    test_evaluate_modulus() # Added test for modulus
+    test_evaluate_modulus_by_zero() # Added test for modulus by zero error
     test_unary_negation() # Added test for negation
     test_evaluate_complex_expression()
     test_evaluate_subtraction()
