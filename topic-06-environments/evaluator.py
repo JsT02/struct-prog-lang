@@ -47,6 +47,11 @@ def evaluate_expression(ast, environment):
         if right_value == 0:
             raise Exception("Division by zero")
         return left_value / right_value, environment
+    elif ast["tag"] == "%": # Added modulus
+        # Add error handling for modulus by zero
+        if right_value == 0:
+            raise Exception("Modulus by zero")
+        return left_value % right_value, environment
     elif ast["tag"] == "*":
         return left_value * right_value, environment
     elif ast["tag"] == "<":
@@ -166,6 +171,14 @@ def test_evaluate_division():
     print("test evaluate division.")
     equals("15/5", {}, 3)
 
+def test_evaluate_modulus(): # Added modulus test
+    print("test evaulate modulus.")
+    equals("10 % 3",{},1)
+
+def test_evaluate_modulus_assignment(): # Added specific modulus test case for assignment
+    print("test evaluate modulus assignment")
+    equals("x = 10 % 3",{}, None, {"x": 1})
+
 
 def test_evaluate_unary_operators():
     print("test evaluate unary operators.")
@@ -203,6 +216,13 @@ def test_evaluate_division_by_zero():
     except Exception as e:
         assert str(e) == "Division by zero"
 
+def test_evaluate_modulus_by_zero(): # Added modulus by zero test
+    print("test evaluate modulus by zero.")
+    try:
+        equals("1%0",{},None)
+        assert False, "Expected a modulus by zero error"
+    except Exception as e:
+        assert str(e) == "Modulus by zero"
 
 def test_evaluate_if_statement():
     print("test evaluate if statement.")
@@ -232,6 +252,9 @@ if __name__ == "__main__":
     test_evaluate_complex_expression()
     test_evaluate_subtraction()
     test_evaluate_division()
+    test_evaluate_modulus() # Added modulus test
+    test_evaluate_modulus_assignment() # Added specificmodulus test for assignment
+    test_evaluate_modulus_by_zero() # Added modulus by zero test
     test_evaluate_division_by_zero()
     test_evaluate_unary_operators()
     test_evaluate_relational_operators()

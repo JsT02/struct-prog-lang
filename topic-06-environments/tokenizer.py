@@ -26,6 +26,7 @@ patterns = [
     [r"-", "-"],
     [r"\*", "*"],
     [r"/", "/"],
+    [r"%","%"], # Added modulus symbol
     [r"\(", "("],
     [r"\)", ")"],
     [r"\{", "{"],
@@ -101,13 +102,13 @@ def tokenize(characters):
 
 def test_simple_tokens():
     print("testing simple tokens...")
-    examples = ".,[,],+,-,*,/,(,),{,},;,!,&&,||,<,>,<=,>=,==,!=".split(",")
+    examples = ".,[,],+,-,*,/,%,(,),{,},;,!,&&,||,<,>,<=,>=,==,!=".split(",") # Added modulus symbol
     for example in examples:
         t = tokenize(example)[0]
         assert t["tag"] == example
         assert t["position"] == 0
         assert "value" not in t
-    example = "(*/ +-[]{})  "
+    example = "(*/ %+-[]{})  " # Added modulus symbol
     t = tokenize(example)
     example = example.replace(" ", "")
     n = len(example)
