@@ -10,7 +10,7 @@ logical_expression = logical_term { "||" logical_term }
 logical_term = logical_factor {"&&" logical_factor}
 logical_factor = relational_expression | "!" logical_factor
 expression = logical_expression
-term = factor { ("*" | "/") factor }
+term = factor { ("*" | "/" | "%") factor } Added Modulus Operator
 factor = number | identifier | "(" expression ")" | "-" factor | "!" factor
 number = <number>
 """
@@ -138,7 +138,7 @@ def parse_arithmetic_expression(tokens):
 
 def parse_term(tokens):
     node, tokens = parse_factor(tokens)
-    while tokens[0]["tag"] in ["*", "/"]:
+    while tokens[0]["tag"] in ["*", "/","%"]:
         tag = tokens[0]["tag"]
         next_node, tokens = parse_factor(tokens[1:])
         node = {"tag": tag, "left": node, "right": next_node}
@@ -223,6 +223,16 @@ def test_simple_addition_parsing():
         "tag": "+",
         "left": {"tag": "<number>", "value": 1},
         "right": {"tag": "<number>", "value": 2},
+    }
+
+def test_modulus_parsing():
+    print("test modulus parsing...")
+    tokens = tokenize("6 % 3")
+    ast = parse(tokens)
+    assert ast == {
+        "tag": "%",
+        "left": {"tag": "<number>", "value": 6},
+        "right": {"tag": "<number>", "value": 3},
     }
 
 
@@ -563,6 +573,7 @@ def test_block_statement():
 
 if __name__ == "__main__":
     test_simple_addition_parsing()
+    test_modulus_parsing()
     test_simple_identifier_parsing()
     test_unary_operators_parsing()
     test_logical_operators_parsing()
@@ -575,3 +586,4 @@ if __name__ == "__main__":
     test_while_statement()
     test_block_statement()
     print("done.")
+ # type: ignore

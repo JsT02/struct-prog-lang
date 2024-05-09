@@ -45,6 +45,10 @@ def evaluate_expression(ast, environment):
         if right_value == 0:
             raise Exception("Division by zero")
         return left_value / right_value, environment
+    elif ast["tag"] == "%":
+        if right_value == 0:
+            raise Exception("Modulus by zero")
+        return left_value % right_value, environment
     elif ast["tag"] == "*":
         return left_value * right_value, environment
     elif ast["tag"] == "<":
@@ -113,7 +117,7 @@ def evaluate(ast, environment):
 
 
 from tokenizer import tokenize
-from parser import parse
+from parser import parse # type: ignore
 
 
 def equals(code, environment, expected_result, expected_environment=None):
@@ -162,6 +166,9 @@ def test_evaluate_division():
     print("test evaluate division.")
     equals("15/5", {}, 3)
 
+def test_evaluate_modulus():
+    print("test evaluate modulus.")
+    equals("6%3",{},0)
 
 def test_evaluate_unary_operators():
     print("test evaluate unary operators.")
@@ -199,6 +206,13 @@ def test_evaluate_division_by_zero():
     except Exception as e:
         assert str(e) == "Division by zero"
 
+def test_evaluate_modulus_by_zero():
+    print("test evaluate modulus by zero.")
+    try:
+        equals("1%0",{},None)
+        assert False, "Expected a modulus by zero error"
+    except Exception as e:
+        assert str(e) == "Modulus by zero"
 
 def test_evaluate_if_statement():
     print("test evaluate if statement.")
@@ -229,6 +243,8 @@ if __name__ == "__main__":
     test_evaluate_subtraction()
     test_evaluate_division()
     test_evaluate_division_by_zero()
+    test_evaluate_modulus()
+    test_evaluate_modulus_by_zero()
     test_evaluate_unary_operators()
     test_evaluate_relational_operators()
     test_evaluate_logical_operators()

@@ -26,6 +26,7 @@ patterns = [
     [r"-", "-"],
     [r"\*", "*"],
     [r"/", "/"],
+    [r"%","%"],
     [r"\(", "("],
     [r"\)", ")"],
     [r"\{", "{"],
@@ -71,7 +72,7 @@ def tokenize(characters):
             continue
         # complain about errors and throw exception
         if tag == "#error":
-            raise Exception(f"Syntax error: illegal character : {[value]}")
+            raise Exception(f"Syntax error: illegal character : {[value]}") # type: ignore
         else:
             # package the token
             if tag in ["<number>", "<string>", "<boolean>", "<identifier>"]:
@@ -101,7 +102,7 @@ def tokenize(characters):
 
 def test_simple_tokens():
     print("testing simple tokens...")
-    examples = ".,[,],+,-,*,/,(,),{,},;,!,&&,||,<,>,<=,>=,==,!=".split(",")
+    examples = ".,[,],+,-,*,/,%,(,),{,},;,!,&&,||,<,>,<=,>=,==,!=".split(",")
     for example in examples:
         t = tokenize(example)[0]
         assert t["tag"] == example
